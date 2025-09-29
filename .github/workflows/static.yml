@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Console Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: blue;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .game-container {
+      background: #333;
+      border: 20px solid rgb(0, 0, 0);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .title {
+      background: red;
+      font-size: 2em;
+      font-weight: bold;
+      padding: 10px;
+      color: #fff;
+    }
+
+    .screen {
+      background: black;
+      padding: 20px;
+      min-height: 200px;
+      font-size: 1.5em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 비디오 화면 숨김 처리 */
+    video {
+      max-width: 100%;
+      display: none;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: gray;
+      padding: 15px;
+    }
+
+    .btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      font-size: 2em;
+      font-weight: bold;
+      cursor: pointer;
+      color: yellow;
+    }
+
+    .btn-true {
+      background: red;
+    
+    }
+
+    .btn-false {
+      background: red;
+    }
+
+    .ad {
+      flex: 1;
+      margin: 0 10px;
+      background: black;
+      color: white;
+      padding: 10px;
+      font-size: 0.9em;
+    }
+
+    /* 🎯 TV / PC (예: 1920px 이상) */
+    @media (min-width: 1920px) {
+      .title { font-size: 3em; }
+      .screen { font-size: 2em; min-height: 300px; }
+      .btn { width: 80px; height: 80px; font-size: 2.5em; }
+    }
+
+    /* 🎯 태블릿 & 모바일 (예: 768px 이하) */
+    @media (max-width: 768px) {
+      .title { font-size: 1.5em; }
+      .screen { font-size: 1.2em; min-height: 150px; }
+      .btn { width: 50px; height: 50px; font-size: 1.5em; }
+    }
+  </style>
+</head>
+<body>
+  <video controls preload="metadata" playsinline poster="/img/poster.jpg">
+  <source src="https://cdn.example.com/videos/clip.mp4" type="video/mp4">
+  브라우저가 비디오 태그를 지원하지 않습니다.
+</video>
+
+  <div class="game-container">
+    <div class="title">Web Console Game</div>
+
+    <!-- 문제/동영상 영역 -->
+    <div class="screen" id="screen">
+      <span id="question">문제를 불러오는 중...</span>
+      <video id="video" controls></video>
+    </div>
+
+    <!-- 버튼 & 광고 -->
+   <div class="controls">
+      <button class="btn btn-true" onclick="answer(true)" ontouchstart="answer(true)">T</button>
+      <div class="ad">AD 영역 (구글 에드센스 자리)</div>
+      <button class="btn btn-false" onclick="answer(false)" ontouchstart="answer(false)">F</button>
+    </div>
+
+  <script>
+    // 퀴즈 데이터
+    const quiz = [
+      { question: "자바스크립트에서 1+1 === 2 ?", answer: true },
+      { question: "CSS는 프로그래밍 언어이다.", answer: false },
+      { question: "HTML은 웹 페이지 구조를 만든다.", answer: true }
+    ];
+
+    let current = 0;
+
+    function showQuestion() {
+      document.getElementById("question").innerText = quiz[current].question;
+      document.getElementById("video").style.display = "none"; // 영상 숨김
+    }
+
+    function answer(userAnswer) {
+      const video = document.getElementById("video");
+      const question = document.getElementById("question");
+
+      if (userAnswer === quiz[current].answer) {
+        // 정답 → 통과 영상 재생
+        question.innerText = "";
+        video.src = "mp4/pass.mp4"; // 통과 영상
+        video.style.display = "block";
+        video.play();
+
+        // 영상 끝난 후 다음 문제로
+        video.onended = () => {
+          current++;
+          if (current < quiz.length) {
+            showQuestion();
+          } else {
+            question.innerText = "게임 클리어! 🎉";
+            video.style.display = "none";
+          }
+        };
+      } else {
+        // 오답 → 실패 영상 + alert
+        video.src = "mp4/fail.mp4";
+        question.innerText = "";
+        video.style.display = "block";
+        video.play();
+        alert("틀렸습니다!");
+      }
+    }
+
+    // 첫 문제 표시
+    showQuestion();
+  </script>
+</body>
+</html>
